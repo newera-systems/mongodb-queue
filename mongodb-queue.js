@@ -43,6 +43,7 @@ function Queue(db, name, opts) {
     this.name = name
     this.col = db.collection(name)
     this.visibility = opts.visibility || 30
+    this.maxInFlight = opts.maxInFlight || null
     this.delay = opts.delay || 0
 
     if ( opts.deadQueue ) {
@@ -82,7 +83,7 @@ Queue.prototype.add = async function(payload, opts, callback) {
         var visible = delay ? nowPlusSecs(delay) : now()
         var visible = now()
         if(typeof(delay.toISOString) === 'function') {
-            visible = delay.toISOString()        
+            visible = delay.toISOString()
         } else if(delay) { //if(typeof(delay) === 'number'){
             visible = nowPlusSecs(delay)
         }
@@ -133,6 +134,16 @@ Queue.prototype.get = async function(opts, callback) {
         }
 
         var visibility = opts.visibility || self.visibility
+        var maxInFlight = opts.maxInFlight || self.maxInFlight
+
+        if(maxInFlight) {
+            const inFlight = await this.inFlight()
+            if(inFlight > maxInFlight) {
+                return;
+            }
+        }
+
+
         var query = {
             deleted : null,
             visible : { $lte : now() },
