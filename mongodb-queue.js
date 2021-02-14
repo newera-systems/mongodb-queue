@@ -80,7 +80,12 @@ Queue.prototype.add = async function(payload, opts, callback) {
         }
         var delay = opts.delay || self.delay
         var visible = delay ? nowPlusSecs(delay) : now()
-
+        var visible = now()
+        if(typeof(delay.toISOString) === 'function') {
+            visible = delay.toISOString()        
+        } else if(delay) { //if(typeof(delay) === 'number'){
+            visible = nowPlusSecs(delay)
+        }
         var msgs = []
         if (payload instanceof Array) {
             if (payload.length === 0) {
