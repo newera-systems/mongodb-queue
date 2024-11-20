@@ -19,7 +19,7 @@ Create a connection to your MongoDB database, and use it to create a queue objec
 
 ```js
 var mongodb = require('mongodb')
-var mongoDbQueue = require('mongodb-queue')
+import { MongoDBQueue } from '@reedsy/mongodb-queue';
 
 const url = 'mongodb://localhost:27017/'
 const client = new mongodb.MongoClient(url, { useNewUrlParser: true })
